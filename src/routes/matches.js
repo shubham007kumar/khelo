@@ -18,21 +18,21 @@ matchRouter.get("/", async (req, res) => {
 
     }
     try {
-        const data = await db.select().from(matches).orderBy(desc(matches.createdAt)).limit(parsed.data.limit)
+        const limit = parsed.data.limit ?? 50;
+        const data = await db.select().from(matches).orderBy(desc(matches.createdAt)).limit(limit);
         return res.status(200).json({
             data
-        })
+        });
     } catch (err) {
+        console.error("Failed to list matches:", err);
         return res.status(500).json({
-            error: "Failed to list matches",
-            details: JSON.stringify(err)
-        })
+            error: "Failed to list matches"
+        });
     }
 })
 
 matchRouter.post("/", async (req, res) => {
     const parsed = createMatchSchema.safeParse(req.body);
-    const { data: { startTime, endTime, homeScore, awayScore } } = parsed
     if (!parsed.success) {
         return res.status(400).json({
             error: "Invalid payload",
@@ -40,6 +40,7 @@ matchRouter.post("/", async (req, res) => {
         })
 
     }
+    const { startTime, endTime, homeScore, awayScore } = parsed.data;
     try {
         const [event] = await db.insert(matches).values({
             ...parsed.data,
@@ -54,9 +55,9 @@ matchRouter.post("/", async (req, res) => {
             data: event
         })
     } catch (err) {
+        console.error("Failed to create match:", err);
         return res.status(500).json({
-            error: "Failded to create match",
-            details: JSON.stringify(err)
-        })
+            error: "Failded to create match"
+        });
     }
 })

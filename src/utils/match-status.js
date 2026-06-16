@@ -50,8 +50,9 @@ export function getMatchStatus(startTime, endTime, now = new Date()) {
  * @returns {Promise<string|null>} The match status or null if not found.
  */
 export async function getMatchStatusById(matchId) {
-  if (!matchId || isNaN(Number(matchId))) {
-    throw new Error('A valid numeric match ID is required');
+  const idNum = Number(matchId);
+  if (!matchId || isNaN(idNum) || !Number.isInteger(idNum) || idNum <= 0) {
+    throw new Error('A valid positive integer match ID is required');
   }
 
   try {
@@ -75,8 +76,9 @@ export async function getMatchStatusById(matchId) {
  * @returns {Promise<object|null>} The updated match record, or null if not found.
  */
 export async function syncMatchStatus(matchId, status) {
-  if (!matchId || isNaN(Number(matchId))) {
-    throw new Error('A valid numeric match ID is required');
+  const idNum = Number(matchId);
+  if (!matchId || isNaN(idNum) || !Number.isInteger(idNum) || idNum <= 0) {
+    throw new Error('A valid positive integer match ID is required');
   }
 
   if (!status || !VALID_STATUSES.includes(status)) {
