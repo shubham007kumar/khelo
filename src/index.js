@@ -1,8 +1,12 @@
 import express from 'express';
 import { matchRouter } from "./routes/matches.js";
+import http from 'http'
+import { initWsServer } from './ws/server.js';
 
-const app = express();
 const PORT = 8000;
+const app = express();
+const server = http.createServer(app)
+const {broadcastMatchUpdate} = initWsServer(server)
 
 // JSON middleware
 app.use(express.json());
@@ -13,8 +17,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/matches', matchRouter)
-
+app.locals.broadcastMatchUpdate = broadcastMatchUpdate
 // Start the server and log the URL
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
